@@ -2,6 +2,15 @@ pipeline {
     agent { docker { image 'maven:3.9.12' } }
 
     stages {
+         stage('Checkout') {
+            steps {
+                sh '''
+                    git --version
+                    git clone https://github.com/sandeepparmar2k/devops-master-class.git
+                '''
+            }
+        }
+    
         stage ('Build') {
             steps {
                 echo 'Building..'
@@ -15,6 +24,7 @@ pipeline {
             }
         }
     }
+
     post {
         always {
             echo 'This will always run'
