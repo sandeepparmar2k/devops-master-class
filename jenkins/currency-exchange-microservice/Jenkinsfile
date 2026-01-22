@@ -71,22 +71,20 @@ pipeline {
     
     post {
         always {
-            echo '========== Pipeline Finished =========='
+            sh 'echo "========== Pipeline Finished =========="'
             sh 'echo "Build completed at: $(date)"'
         }
         
         success {
-            echo '✓ Build SUCCESSFUL'
+            sh 'echo "========== ✓ Build SUCCESSFUL =========="'
             sh 'echo "Success: Build completed successfully"'
         }
         
         failure {
-            echo '✗ Build FAILED'
             sh 'echo "Failure: Build failed. Check logs above."'
         }
         
         unstable {
-            echo '⚠ Build UNSTABLE'
             sh 'echo "Unstable: Tests failed or warnings detected"'
         }
     }
