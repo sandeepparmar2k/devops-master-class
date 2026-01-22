@@ -1,44 +1,93 @@
 pipeline {
     agent { docker { image 'maven:3.9.12' } }
-
-    stages {
-         stage('Checkout') {
-            steps {
-                sh '''
-                    rm -rf temp-clone
-                    git clone https://github.com/sandeepparmar2k/devops-master-class.git temp-clone
-                    cd temp-clone
-                    ls -la
-                '''
-            }
-        }
     
-        stage ('Build') {
+    options {
+        timestamps()
+        timeout(time: 1, unit: 'HOURS')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    
+    environment {
+        MAVEN_HOME = '/usr/share/maven'
+        JAVA_HOME = '/usr/local/openjdk-11'
+    }
+    
+    stages {
+        stage('Checkout') {
             steps {
-                echo 'Building..'
-                echo 'Current directory: $(pwd)'
+                echo '========== Checkout Stage =========='
                 sh '''
-                    docker --version
-                    mvn clean install
+                    echo "Git repository info:"
+                    git log --oneline -5
+                    echo "Current branch: $(git rev-parse --abbrev-ref HEAD)"
                 '''
             }
         }
-        stage ('Test') {
+        
+        stage('Build') {
             steps {
-                echo 'Testing..'
+                echo '========== Build Stage =========='
+                sh '''
+                    echo "Maven version:"
+                    mvn --version
+                    echo "Java version:"
+                    java -version
+                    echo "Building project..."
+                    mvn clean compile
+                '''
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                echo '========== Test Stage =========='
+                sh '''
+                    echo "Running unit tests..."
+                    mvn test
+                '''
+            }
+        }
+        
+        stage('Package') {
+            steps {
+                echo '========== Package Stage =========='
+                sh '''
+                    echo "Packaging application..."
+                    mvn package -DskipTests
+                '''
+            }
+        }
+        
+        stage('Verify') {
+            steps {
+                echo '========== Verify Stage =========='
+                sh '''
+                    echo "Build artifacts:"
+                    find target -name "*.jar" -o -name "*.war" | head -20
+                '''
             }
         }
     }
-
+    
     post {
         always {
-            echo 'This will always run'
+            echo '========== Pipeline Finished =========='
+            sh 'echo "Build completed at: $(date)"'
         }
+        
         success {
-            echo 'This will run only if successful'
+            echo '✓ Build SUCCESSFUL'
+            sh 'echo "Success: Build completed successfully"'
         }
+        
         failure {
-            echo 'This will run only if failed'
+            echo '✗ Build FAILED'
+            sh 'echo "Failure: Build failed. Check logs above."'
+        }
+        
+        unstable {
+            echo '⚠ Build UNSTABLE'
+            sh 'echo "Unstable: Tests failed or warnings detected"'
         }
     }
 }
