@@ -5,8 +5,10 @@ pipeline {
          stage('Checkout') {
             steps {
                 sh '''
-                    git --version
-                    git clone https://github.com/sandeepparmar2k/devops-master-class.git
+                    rm -rf temp-clone
+                    git clone https://github.com/sandeepparmar2k/devops-master-class.git temp-clone
+                    cd temp-clone
+                    ls -la
                 '''
             }
         }
@@ -14,7 +16,10 @@ pipeline {
         stage ('Build') {
             steps {
                 echo 'Building..'
-                sh 'docker --version'
+                sh '''
+                    docker --version
+                    mvn clean install
+                '''
             }
         }
         stage ('Test') {
