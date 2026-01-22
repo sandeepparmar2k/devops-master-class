@@ -69,23 +69,5 @@ pipeline {
         }
     }
     
-    post {
-        always {
-            sh 'echo "========== Pipeline Finished =========="'
-            sh 'echo "Build completed at: $(date)"'
-        }
-        
-        success {
-            sh 'echo "========== ✓ Build SUCCESSFUL =========="'
-            sh 'echo "Success: Build completed successfully"'
-        }
-        
-        failure {
-            sh 'echo "Failure: Build failed. Check logs above."'
-        }
-        
-        unstable {
-            sh 'echo "Unstable: Tests failed or warnings detected"'
-        }
-    }
+    
 }
