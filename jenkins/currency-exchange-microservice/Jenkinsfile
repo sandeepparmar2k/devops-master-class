@@ -7,9 +7,10 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '10'))
     }
     
-    environment {
-        MAVEN_HOME = '/usr/share/maven'
-        JAVA_HOME = '/usr/local/openjdk-11'
+   environment {
+    DOCKER_CERT_PATH = ''
+    DOCKER_TLS_VERIFY = ''
+    DOCKER_HOST = 'npipe:////./pipe/docker_engine'
     }
     
     stages {
